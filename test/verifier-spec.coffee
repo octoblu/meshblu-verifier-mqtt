@@ -2,7 +2,7 @@ shmock = require 'shmock'
 Verifier = require '../src/verifier'
 MockMeshbluMQTT = require './mock-meshblu-mqtt'
 
-describe 'Verifier', ->
+xdescribe 'Verifier', ->
   beforeEach (done) ->
     @whoamiHandler = sinon.stub()
 
@@ -29,9 +29,8 @@ describe 'Verifier', ->
         @whoamiHandler.yields uuid: 'some-device', type: 'meshblu:verifier'
 
       beforeEach (done) ->
-        @sut.verify (@error) =>
-          done @error
+        @sut.verify (error) =>
+          done error
 
       it 'should not error', ->
-        expect(@error).not.to.exist
         expect(@whoamiHandler).to.be.called
