@@ -12,6 +12,7 @@ class Command
       .parse process.argv
 
   run: =>
+    process.on 'uncaughtException', @die
     @parseOptions()
     meshbluConfig = new MeshbluConfig().toJSON()
     onError = @die
