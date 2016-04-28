@@ -9,7 +9,9 @@ class Verifier
   _connect: (callback) =>
     debug '+ connect'
     @meshblu = new MeshbluMqtt @meshbluConfig
-    @meshblu.on 'message', @_onMessage
+    @meshblu.on 'meshblu.message', @_onMessage
+    @meshblu.on 'meshblu.error', (message) =>
+       throw new Error message
     @meshblu.connect (response) =>
       callback()
 
