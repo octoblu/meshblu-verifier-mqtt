@@ -40,6 +40,12 @@ class Verifier
       debug 'subscribeSelf:', {error, data}
       callback error, data
 
+  _requestFirehose: (callback) =>
+    debug '+ requestFirehose'
+    @meshblu.requestFirehose null, (error, data) =>
+      debug 'requestFirehose:', {error, data}
+      callback error, data
+
   _register: (callback) =>
     debug '+ register'
     @meshblu.register null, (error, data) =>
@@ -92,6 +98,7 @@ class Verifier
       @_close
       @_connect
       @_whoami
+      @_requestFirehose
       # @_subscribeSelf
       @_message
       @_verifyResponse
