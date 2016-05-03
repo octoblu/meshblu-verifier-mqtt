@@ -5,6 +5,8 @@ MeshbluMqtt = require 'meshblu-mqtt'
 
 class Verifier
   constructor: ({@meshbluConfig, @onError}) ->
+    @nonce = Date.now()
+    @someUuidToCreate = "master-of-the-universe-#{@nonce}"
 
   _connect: (callback) =>
     debug '+ connect'
@@ -15,17 +17,36 @@ class Verifier
     @meshblu.connect (response) =>
       callback()
 
+  _updateSetData: (callback) =>
+    debug '+ updateSetData'
+    @meshblu.update @meshblu.uuid, {$set: nonce: @nonce, thing: @someUuidToCreate}, (error, data) =>
+      debug 'updateSetData:', {error, data}
+      callback null, data
+
+  _updateRenameData: (callback) =>
+    debug '+ updateRenameData'
+    @meshblu.update @meshblu.uuid, {$rename: thing: 'uuid'}, (error, data) =>
+      callback null, data
+
   _whoami: (callback) =>
     debug '+ whoami'
     @meshblu.whoami (error, data) =>
       debug 'whoami:', {error, data}
-      return callback(new Error 'whoami invalid') if !data? or @meshbluConfig.uuid != data.uuid
+      callback error, data
+
+  _whoamiCheckUuid: (callback) =>
+    @_whoami (error, data) =>
+      return callback(new Error 'whoami uuid invalid') if !data? or @meshbluConfig.uuid != data.uuid
+      callback error, data
+
+  _whoamiCheckUuidAndNonce: (callback) =>
+    @_whoamiCheckUuid (error, data) =>
+      return callback(new Error 'whoami nonce invalid') if !data? or @nonce != data.nonce
       callback error, data
 
   _whoamiNull: (callback) =>
     debug '+ whoamiNull'
-    @meshblu.whoami (error, data) =>
-      debug 'whoamiNull:', {error, data}
+    @_whoami (error, data) =>
       return callback(new Error 'whoamiNull is not null') if data?
       callback null, data
 
@@ -90,24 +111,26 @@ class Verifier
   verify: (callback) =>
     delete @meshbluConfig.uuid
     delete @meshbluConfig.token
-    @nonce = Date.now()
 
     async.series [
       @_connect
       @_register
       @_close
       @_connect
-      @_whoami
+      @_whoamiCheckUuid
+      @_updateSetData
+      @_updateRenameData
+      @_whoamiCheckUuidAndNonce
       @_requestFirehose
       # @_subscribeSelf
       @_message
       @_verifyResponse
       # @_subscribeConfig
-      # @_update
       @_unregister
       @_whoamiNull
     ], (error) =>
-      @_close =>
-        callback(error)
+      @_unregister =>
+        @_close =>
+          callback(error)
 
 module.exports = Verifier
