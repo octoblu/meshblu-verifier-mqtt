@@ -10,9 +10,11 @@ class Verifier
 
   _connect: (callback) =>
     debug '+ connect'
+    @meshbluConfig.rejectUnauthorized = false
+    @meshbluConfig.bridged = true
     @meshblu = new MeshbluMqtt @meshbluConfig
-    @meshblu.on 'meshblu.message', @_onMessage
-    @meshblu.on 'meshblu.error', (message) =>
+    @meshblu.on 'meshblu/message', @_onMessage
+    @meshblu.on 'meshblu/error', (message) =>
        throw new Error message
     @meshblu.connect (response) =>
       callback()
@@ -26,6 +28,7 @@ class Verifier
   _updateRenameData: (callback) =>
     debug '+ updateRenameData'
     @meshblu.update @meshblu.uuid, {$rename: thing: 'uuid'}, (error, data) =>
+      debug 'updateSetData:', {error, data}
       callback null, data
 
   _whoami: (callback) =>
@@ -35,11 +38,13 @@ class Verifier
       callback error, data
 
   _whoamiCheckUuid: (callback) =>
+    debug '+ whoamiCheckUuid'
     @_whoami (error, data) =>
       return callback(new Error 'whoami uuid invalid') if !data? or @meshbluConfig.uuid != data.uuid
       callback error, data
 
   _whoamiCheckUuidAndNonce: (callback) =>
+    debug '+ whoamiCheckUuidAndNonce'
     @_whoamiCheckUuid (error, data) =>
       return callback(new Error 'whoami nonce invalid') if !data? or @nonce != data.nonce
       callback error, data
@@ -61,10 +66,10 @@ class Verifier
       debug 'subscribeSelf:', {error, data}
       callback error, data
 
-  _requestFirehose: (callback) =>
-    debug '+ requestFirehose'
-    @meshblu.requestFirehose null, (error, data) =>
-      debug 'requestFirehose:', {error, data}
+  _connectFirehose: (callback) =>
+    debug '+ connectFirehose'
+    @meshblu.connectFirehose null, (error, data) =>
+      debug 'connectFirehose:', {error, data}
       callback error, data
 
   _register: (callback) =>
@@ -119,9 +124,10 @@ class Verifier
       @_connect
       @_whoamiCheckUuid
       @_updateSetData
+      @_whoami
       @_updateRenameData
       @_whoamiCheckUuidAndNonce
-      @_requestFirehose
+      @_connectFirehose
       # @_subscribeSelf
       @_message
       @_verifyResponse
