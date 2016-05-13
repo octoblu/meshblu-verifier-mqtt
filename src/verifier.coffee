@@ -92,9 +92,10 @@ class Verifier
       devices: [@meshbluConfig.uuid]
       payload: @nonce
 
-    @meshblu.message message, (error) =>
-      debug 'message:', {error}
-      callback error
+    @meshblu.message message #, (error) =>
+      # debug 'message:', {error}
+      # callback error
+    callback()
 
   _verifyResponse: (callback) =>
     (
