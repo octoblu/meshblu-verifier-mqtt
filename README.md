@@ -1,5 +1,5 @@
 # meshblu-verifier-mqtt
-Verify Meshblu over socket.io
+Verify Meshblu over MQTT
 
 [![Build Status](https://travis-ci.org/octoblu/meshblu-verifier-mqtt.svg?branch=master)](https://travis-ci.org/octoblu/meshblu-verifier-mqtt)
 [![Test Coverage](https://codecov.io/gh/octoblu/meshblu-verifier-mqtt/branch/master/graph/badge.svg)](https://codecov.io/gh/octoblu/meshblu-verifier-mqtt)
@@ -8,4 +8,3 @@ Verify Meshblu over socket.io
 [![Slack Status](http://community-slack.octoblu.com/badge.svg)](http://community-slack.octoblu.com)
 
 [![NPM](https://nodei.co/npm/meshblu-verifier-mqtt.svg?style=flat)](https://npmjs.org/package/meshblu-verifier-mqtt)
-

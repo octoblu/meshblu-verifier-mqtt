@@ -1,30 +1,29 @@
 language: node_js
 node_js:
   - '6'
-addons:
-  code_climate:
-    repo_token: a161a57cbff98f0d2f677d076f901a042c73992bcf3465b7820d5c0ea3aea295
-before_script:
-  - npm install -g codeclimate-test-reporter
-after_script:
-  - codeclimate-test-reporter < coverage/lcov.info
+branches:
+  only:
+    - '/^v[0-9]/'
+before_install:
+- npm install --global yarn
+install:
+- yarn install
+script:
+- yarn test
+after_success:
+  - yarn coverage
+  - 'yarn mocha:json'
+  - 'bash <(curl -s https://codecov.io/bash)'
+  - 'bash <(curl -s https://codecov.octoblu.com/bash)'
 deploy:
   provider: npm
   email: serveradmin@octoblu.com
   api_key:
     secure: >-
-      aCKjuXjJpyGSkOTsXYm/hDeUB6hQ4oABEllb0GL0LVmovjH/1KTKwipvUf756XSQ9gyQdozCnHV2BIFrSZurxLQFBIYLCmn2WSlVC2AxR3BIFNTjWCvzIsMoOf/xfU/esokmDrdzb7AdSxD/MlCmw01V+dql3tvGyo/nAR/fj1tMubO5f0HkMEuL2/DTxPRvnGxuEXzY6hYzHCyC2CElO3pP8X1DAj1CM+5V53cnhKlVRQ6qdGpEj95l27ny6Txao1LIoiwDEedpgfrn3iUgDNy4uh7BGpGsFPm/33eMBtg+VlAEwto1FhEJ51pXRD7tY7FlFwb9hM8c9fcDgGEBDhkc/aF/hbk0sa/AcLqydVYoCvTDDx6RsdmMwMyXJW73oB+B8zotpxkz49DuAq/FeqmeTr1dekVDDN9QYCckMsa7K/VKWH6VScgVFMTvOYHr9w0jOb5P0ZbjLaIVoNtPTcbM37If+1UwCCn0dt6krkfGk5eqok/2C9iMKE6N9Gyr5AOb7Mx/gxrsAKKG+LI3GT01/OwTwYoyeQNcUuSMDjQaaKfCdZiOqcqZf2CzCEcvMCQHW1XQR1DkiXUXdgeVGT8bUFW2nwuJFP3J0Jvlz7SObW6NBKkE9kT3tcCjKYhIzLSWQFcW/DMhvhRAXju8aGowyJqlMOjNc8nZlUSVWcg=
+      NR9UpphHjcnUJPI8moqgR+cnW2pifmBcXRE10ggqOUYulGGtzS+RGBs/8sjZPRlwqKFoiemcWR69MeRG7Klaba0XrInc3hH574N+prKgWRPySF9mUtWV0scDXbr81nInHWHkpVeyVVzUVbFVwiiQ1VH/kQrjreadVHYm3hgKvSg5AzrIcn8U1lSW2MBJhks10fEeUD/YYrRfbLAJ/sC4pck0YS5o2Wu8aN12hPPjdgj4K9i8/FNLHJuxTAGa9yt0hGNeroSj/KR6u132qrNamnn3jkLv3KOoVJA6Td1e/USXMD4o6gS4c+nULold7aF8ERfB3ebNx0nbgFcN1XdTYtTBT5lpqGncD/mDGUVOapbyAUVWqUVp9uSJZrh+nPY6Uw3Eiw63h75H4AI37YLui6bXUjLHfD0s5fjAylBSvcF3yGkcwJBuqALO7kjCwxKa6QyFfG2m7R/7dj2zn8d890pT5z2wq3JPCex3VrQsIaE6bmuHh7LT9UYZh4Cd3oh1pLTIVC0f8Gaykr6dQglIrFsRMz18o6iuEiy0H6X2f4/DhLRm7QVvbXoBdJDce8d11eJw8nVQDX71yS3x5nAnBZJ+OZLBKCctxYTkKGsBfCqGmhz/HFqQZ7cdgdoWrdUCPzi01lmd+nSAAOV3UXhrs2JBhYu99zHKCDGgaS+J9dc=
   'on':
     tags: true
     branches: true
-after_success:
-  - npm run coverage
-  - 'npm run mocha:json'
-  - 'bash <(curl -s https://codecov.io/bash)'
-  - 'bash <(curl -s https://codecov.octoblu.com/bash)'
-branches:
-  only:
-    - '/^v[0-9]/'
 notifications:
   webhooks:
     - 'https://beekeeper.octoblu.com/webhooks/travis:ci'
